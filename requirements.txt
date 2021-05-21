@@ -1,0 +1,15 @@
+torch
+torchvision
+torchaudio
+# numpy
+# matplotlib
+# seaborn
+# pandas
+# scikit-learn
+
+# development and testing
+black
+flake8
+pep8-naming
+pydocstyle
+mypy
