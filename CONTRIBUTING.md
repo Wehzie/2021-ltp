@@ -2,7 +2,7 @@
 
 ### Architecture
     
-- a description of the architecture is found in [ARCHITECTURE.md](ARCHITECTURE.md)
+- a description of the architecture is maintained at [ARCHITECTURE.md](ARCHITECTURE.md)
 - [ARCHITECTURE.md](ARCHITECTURE.md) contains a written and graphical description
 - the architecture is drawn using vector graphics, e.G. <https://www.diagrams.net/>
 
