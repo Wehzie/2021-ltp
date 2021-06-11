@@ -13,11 +13,14 @@ def make_translations_df(german_file, english_file):
     f_en = open(english_file, encoding='utf-8')
     translations = []
     count = 0
+    max = 600000
     for line_de, line_en in zip(f_de, f_en):
         if count % 10000 == 0:
-            print('Translated {:.4f}% of lines'.format(count/1920209*100))
-        if isinstance(line_de, six.binary_type):
-            line_de = line_de.decode("utf-8")
+            print('Translated {:.4f}% of lines'.format(count/max*100))
+            if count == max:
+                break
+        # if isinstance(line_de, six.binary_type):
+        #     line_de = line_de.decode("utf-8")
         translated_eng = client.translate(line_de, source_language = 'de')
         translations.append([line_de, line_en, translated_eng["translatedText"]])
         count += 1
