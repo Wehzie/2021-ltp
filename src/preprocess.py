@@ -1,13 +1,15 @@
-from google.cloud import translate_v2 as translate
 import tarfile
-import six
 import pandas as pd
 
-def unzip(fname):
+from google.cloud import translate_v2 as translate
+
+from pathlib import Path
+
+def unzip(fname) -> None:
     tf = tarfile.open(fname)
-    tf.extractall("data/raw")
+    tf.extractall(Path("data/raw"))
         
-def make_translations_df(german_file, english_file):
+def make_translations_df(german_file: Path, english_file: Path) -> pd.DataFrame:
     client = translate.Client(target_language='en')
     f_de = open(german_file, encoding='utf-8')
     f_en = open(english_file, encoding='utf-8')
@@ -29,7 +31,7 @@ def make_translations_df(german_file, english_file):
     df = pd.DataFrame(translations, columns = ['Original', 'Human', 'Automated'])
     return df
     
-def make_datasets(data):
+def make_datasets(data: pd.DataFrame) -> None:
     shuffled = data.sample(frac=1)
     size = len(shuffled)
     train_size = int(size * 6 / 10)
@@ -43,9 +45,9 @@ def make_datasets(data):
     dev.to_csv('data/dev/europarl_dev.csv')
         
 if __name__ == "__main__":
-    zipped = 'data/raw/de-en.tgz'
-    german_file = 'data/raw/europarl-v7.de-en.de'
-    english_file = 'data/raw/europarl-v7.de-en.en'
+    zipped = Path('data/raw/de-en.tgz')
+    german_file = Path('data/raw/europarl-v7.de-en.de')
+    english_file = Path('data/raw/europarl-v7.de-en.en')
     # unzip(zipped)
     translated = make_translations_df(german_file, english_file)
     make_datasets(translated)
