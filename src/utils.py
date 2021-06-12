@@ -101,28 +101,6 @@ sent = list(doc.sents)[0]
 
 
 for sent in doc.sents:
-    for x in sent:
-        print(type(x))
-
-    print(sent._.parse_string)
-    print(type(sent))
-    iterat = iter(sent._.constituents)
-    count_left = 0
-    count_right = 0
-    for x in iterat:
-        print(x, "\t ", x._.parent)
-        if x._.parent != None:
-            print(list(x._.parent))
-            parent_list = list(x._.parent)
-            if list(x)[len(list(x))-1] == list(x._.parent)[len(list(x._.parent))-1]:
-                print("\t +1, right")
-                count_right = count_right + 1
-            if list(x)[0] == list(x._.parent)[0]:
-                print("\t +1, left")
-                count_left = count_left + 1
-  
-
-
 
 # print(sent._.parse_string)
 
