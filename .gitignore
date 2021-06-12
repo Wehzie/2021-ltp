@@ -131,6 +131,9 @@ dmypy.json
 # Visual Studio Code
 .vscode
 
+# IntelliJ
+.idea
+
 # Anything inside the data/ directory except the DATA.md
 data/*
 !data/DATA.md
