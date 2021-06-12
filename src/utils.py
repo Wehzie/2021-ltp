@@ -1,6 +1,8 @@
 import benepar
 import spacy
-
+from numpy import average
+from nltk import Tree, acyclic_breadth_first
+import pandas as pd
 
 # Before usage run the following in your command line:
 #       python3 -m spacy download en_core_web_md
@@ -11,6 +13,9 @@ import spacy
 def compute_density_metrics(sent) -> dict:
     densities = {'DET':0, 'AUX':0,'CONJ':0, 'PRON':0, 'ADP':0, 'PUNCT':0, 'FUNC':0}
     
+    if len(sent) == 0:
+        return densities
+    
     for w in sent:
         if w.pos_ in densities.keys():
             densities[w.pos_] += 1
@@ -19,14 +24,14 @@ def compute_density_metrics(sent) -> dict:
         elif w.pos_ == 'PART':
             densities['FUNC'] += 1
     
-    densities['FUNC'] += (densities['DET'] + 
-        densities['AUX'] + densities['CONJ'] + 
-        densities['PRON'] + densities['ADP'] + densities['PUNCT'])
-
-    cont_words = len(sent) - densities['FUNC']        
-    densities = {k: (v/cont_words/len(sent)) for k,v in densities.items()}
+    densities['FUNC'] += (densities['DET'] + densities['AUX'] + densities['CONJ'] + densities['PRON'] + densities['ADP'] + densities['PUNCT'])
+    cont_words = len(sent) - densities['FUNC'] 
+    
+    if cont_words > 0 :       
+        densities = {k: (v/cont_words/len(sent)) for k,v in densities.items()}
     
     return densities
+
 
 
 def walk_tree(node, depth) -> int:
