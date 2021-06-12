@@ -1,11 +1,16 @@
 torch
 torchvision
 torchaudio
-# numpy
-# matplotlib
-# seaborn
-# pandas
-# scikit-learn
+numpy
+pandas
+nltk
+spacy
+benepar
+google-cloud-translate
+
+# Data requirements
+# python3 -m spacy download en_core_web_md
+# benepar.download('benepar_en3')
 
 # development and testing
 black
