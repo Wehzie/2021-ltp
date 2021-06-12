@@ -64,23 +64,24 @@ def np_val(x):
 
 
 def compute_parse_tree_metrics(sent):
-    constituent_iter = iter(sent._.constituents)
-    count_left = 0
-    count_right = 0
-    count_left_NP = 0
-    count_right_NP = 0
-    for x in constituent_iter:
-        if x._.parent != None:
-            if list(x)[len(list(x)) - 1] == list(x._.parent)[len(list(x._.parent)) - 1]:
-                count_right_NP = count_right_NP + np_val(x)
-                count_right = count_right + 1
-            if list(x)[0] == list(x._.parent)[0]:
-                count_left_NP = count_left_NP + np_val(x)
-                count_left = count_left + 1
-
-    parse_tree = {'right_branches_all': count_right/len(sent), 'left_branches_all': count_left/len(sent),
-                  'right_branches_NP': count_right_NP / len(sent), 'left_branches_NP': count_left_NP / len(sent),
-                  'branching_index_all': count_right - count_left}
+    head_final_count = 0
+    head_first_count = 0
+    count_final_NP = 0
+    count_first_NP = 0
+    for token in sent:
+        if token.i < token.head.i:
+            head_final_count += 1
+            if token.tag_ == "NN":
+                count_final_NP += 1
+        elif token.i > token.head.i:
+            head_first_count += 1
+            if token.tag_ == "NN":
+                count_first_NP += 1
+        else:
+            pass
+    parse_tree = {'right_branches_all': head_first_count/len(sent), 'left_branches_all': head_final_count/len(sent),
+                  'right_branches_NP': count_first_NP / len(sent), 'left_branches_NP': count_final_NP / len(sent),
+                  'branching_index_all': head_final_count - head_first_count}
     return parse_tree
 
 
