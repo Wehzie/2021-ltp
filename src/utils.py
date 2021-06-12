@@ -42,21 +42,6 @@ def get_const_size(sent, label):
     return max_s, average
 
 
-def tok_format(tok):
-    return "_".join([tok.orth_, tok.tag_])
-
-def to_nltk_tree(node, left, right):
-    left = left + node.n_lefts
-    right = right + node.n_rights
-    print(node.text)
-    print(left, right)
-    if node.n_lefts + node.n_rights > 0:
-        return Tree(tok_format(node), [to_nltk_tree(child, left, right) for child in node.children])
-    else:
-        return tok_format(node)
-
-
-
 
 def compute_constituents_metrics(sent):
     constituents = {'S_len': len(sent), 'Depth': walk_tree(sent.root,1)}
@@ -77,12 +62,11 @@ def compute_parse_tree_metrics(sent):
             if list(x)[0] == list(x._.parent)[0]:
                 count_left = count_left + 1
 
-    if count_right != 0:
-        ratio = count_left/count_right
-    else:
-        ratio = 0
 
-    parse_tree = {'right_branches': count_right, 'left_branches': count_left, 'ratio': ratio}
+
+
+    parse_tree = {'right_branches_all': count_right/len(sent), 'left_branches_all': count_left/len(sent),
+                  'branching_index_all': count_right - count_left}
     return parse_tree
 
 
@@ -93,7 +77,7 @@ else:
     nlp.add_pipe("benepar", config={"model": "benepar_en3"})
 
 doc = nlp("The time for action is now.")
-doc = nlp("Every man asked some actress that he met about some play that she appeared in")
+doc = nlp("Every man asked some actress that he met about some play that she appeared in.")
 #doc = nlp("I throw the ball to the dog")
 
 
@@ -102,6 +86,7 @@ sent = list(doc.sents)[0]
 
 for sent in doc.sents:
 
+    print(compute_parse_tree_metrics(sent))
 # print(sent._.parse_string)
 
 
