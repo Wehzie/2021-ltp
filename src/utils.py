@@ -51,21 +51,35 @@ def compute_constituents_metrics(sent):
     constituents['ADJP_max'], constituents['ADJP_avg'] = get_const_size(sent, "ADJP")
     return constituents
 
+def np_val(x):
+    (a) = x._.labels
+    try:
+        label = a[0]
+    except IndexError:
+        label = "None"
+    if label == "NP":
+        return 1
+    else:
+        return 0
+
+
 def compute_parse_tree_metrics(sent):
     constituent_iter = iter(sent._.constituents)
     count_left = 0
     count_right = 0
+    count_left_NP = 0
+    count_right_NP = 0
     for x in constituent_iter:
         if x._.parent != None:
             if list(x)[len(list(x)) - 1] == list(x._.parent)[len(list(x._.parent)) - 1]:
+                count_right_NP = count_right_NP + np_val(x)
                 count_right = count_right + 1
             if list(x)[0] == list(x._.parent)[0]:
+                count_left_NP = count_left_NP + np_val(x)
                 count_left = count_left + 1
 
-
-
-
     parse_tree = {'right_branches_all': count_right/len(sent), 'left_branches_all': count_left/len(sent),
+                  'right_branches_NP': count_right_NP / len(sent), 'left_branches_NP': count_left_NP / len(sent),
                   'branching_index_all': count_right - count_left}
     return parse_tree
 
