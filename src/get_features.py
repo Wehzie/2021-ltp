@@ -1,10 +1,9 @@
 import benepar
 import spacy
-from numpy import average
-from nltk import Tree, acyclic_breadth_first
 import pandas as pd
 import os
 import sys
+from pathlib import Path
 
 #benepar.download('benepar_en3')
 
@@ -14,6 +13,7 @@ from src.utils import *
 def get_features(doc, label, original) -> dict:
     # get the first sentence only
     sent = list(doc.sents)[0]
+
     # make dict of all features 
     example = {'label': label, 'original': original, 'text': sent.text}
     example.update(compute_density_metrics(sent))
@@ -21,29 +21,15 @@ def get_features(doc, label, original) -> dict:
     example.update(compute_parse_tree_metrics(sent))
     return example
 
-    
-
-if __name__ == "__main__":
-    
-    nlp = spacy.load('en_core_web_md')
-    
-    if spacy.__version__.startswith('2'):
-        nlp.add_pipe(benepar.BeneparComponent("benepar_en3"))
-    else:
-        nlp.add_pipe("benepar", config={"model": "benepar_en3"})
-
-    path = 'data/dev/europarl_dev.csv'
-    data = pd.read_csv(path, index_col= 0, header = 0)
-    
+def get_corpus_features(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Speed: 51 seconds for 100 rows.
+    """
     list_of_examples = []
-    count = 0
-    size = len(data.index)
+    size = len(df.index)
     
-    for _, line in data.iterrows():
-        
-        # if count == 100:
-        #     break
-        
+    count=0
+    for _, line in df.iterrows():
         if count % 10000 == 0:
             print('Computed features for {:.4f}% of lines'.format(count/size*100))
             
@@ -55,7 +41,57 @@ if __name__ == "__main__":
         example_auto = get_features(nlp(str(line['Automated']).replace("&#39;", "'")), 'automated', line['Original'])
         list_of_examples.append(example_auto)
         count += 1
+
+    return pd.DataFrame(list_of_examples)
+
+def format(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    df.head():
+    Index   Original    Translator  Translation
+
+                        Human
+                        Automated
+                        Human
+                        Automated
+                        ...
+                        
+    """
+
+    # separate rows for human and machine translations
+    df = df.melt(id_vars=["Original"], 
+        value_vars=["Human", "Automated"],
+        var_name="Translator", 
+        value_name="Translation")
+    # manually name index to "Index"
+    df.index.rename("Index", inplace=True)
+    # sort data frame
+    df = df.sort_values(by=["Original", "Index"])
+    return df
+
+def get_corpus_features_list_comp(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Speed: 50 seconds for 100 rows.
+    """
+    df = format(df)
+    out = [ get_features(nlp(str(translation).replace("&#39;", "'")), label, original) 
+            for label, translation, original in 
+            zip(df["Translator"], df["Translation"], df["Original"]) ]
+    return pd.DataFrame.from_records(out)
+
+if __name__ == "__main__":
+    nlp = spacy.load('en_core_web_md')
+
+    if spacy.__version__.startswith('2'):
+        nlp.add_pipe(benepar.BeneparComponent("benepar_en3"))
+    else:
+        nlp.add_pipe("benepar", config={"model": "benepar_en3"})
+
+    # dev data
+    path = Path('data/dev/europarl_dev.csv')
+    df = pd.read_csv(path, index_col = 0, header = 0, nrows=100)
+    get_corpus_features(df).to_csv(Path('data/dev/features_dev_t.csv'))
         
-    features_df = pd.DataFrame(list_of_examples)
-    features_df.to_csv('data/dev/features_dev.csv')
-    
+    # test data
+    path = Path('data/test/europarl_test.csv')
+    df = pd.read_csv(path, index_col = 0, header = 0)
+    get_corpus_features(df).to_csv(Path('data/test/features_test.csv'))

@@ -1,8 +1,5 @@
 import benepar
 import spacy
-from numpy import average
-from nltk import Tree, acyclic_breadth_first
-import pandas as pd
 
 # Before usage run the following in your command line:
 #       python3 -m spacy download en_core_web_md
