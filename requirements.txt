@@ -8,6 +8,7 @@ spacy
 benepar
 google-cloud-translate
 simpletransformers
+transformers
 
 # Data requirements
 # import benepar
