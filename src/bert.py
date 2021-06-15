@@ -4,7 +4,10 @@ import logging
 import os
 import sys
 from pathlib import Path
+import torch
+
 sys.path.append(os.getcwd())
+
 from src.utils import make_bert_datasets
 
 logging.basicConfig(level=logging.INFO)
@@ -14,7 +17,7 @@ transformers_logger.setLevel(logging.WARNING)
 dev_path = Path("data/dev/europarl_dev.csv")
 
 # read data
-data = pd.read_csv(dev_path, index_col=0, header = 0, nrows=2000) 
+data = pd.read_csv(dev_path, index_col=0, header = 0, nrows=20) 
 
 # format and split data
 data = make_bert_datasets(data)
@@ -28,7 +31,7 @@ model_args = ClassificationArgs(num_train_epochs=1)
 
 # Create a ClassificationModel
 model = ClassificationModel(
-    "bert", "bert-base-cased", args=model_args, use_cuda=False
+    "bert", "bert-base-cased", args=model_args, use_cuda=torch.cuda.is_available()
 )
 
 # Train the model
