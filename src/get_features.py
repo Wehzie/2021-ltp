@@ -44,29 +44,6 @@ def get_corpus_features(df: pd.DataFrame) -> pd.DataFrame:
 
     return pd.DataFrame(list_of_examples)
 
-def format(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    df.head():
-    Index   Original    Translator  Translation
-
-                        Human
-                        Automated
-                        Human
-                        Automated
-                        ...
-                        
-    """
-
-    # separate rows for human and machine translations
-    df = df.melt(id_vars=["Original"], 
-        value_vars=["Human", "Automated"],
-        var_name="Translator", 
-        value_name="Translation")
-    # manually name index to "Index"
-    df.index.rename("Index", inplace=True)
-    # sort data frame
-    df = df.sort_values(by=["Original", "Index"])
-    return df
 
 def get_corpus_features_list_comp(df: pd.DataFrame) -> pd.DataFrame:
     """

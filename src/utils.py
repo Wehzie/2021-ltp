@@ -1,4 +1,5 @@
 import benepar
+import pandas as pd
 import spacy
 
 # Before usage run the following in your command line:
@@ -100,23 +101,52 @@ def compute_parse_tree_metrics(sent) -> dict:
 
     return parse_tree
 
+def format(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    df.head():
+    Index   Original    Translator  Translation
 
-if __name__ == "__main__":
-    nlp = spacy.load('en_core_web_md')
-    if spacy.__version__.startswith('2'):
-        nlp.add_pipe(benepar.BeneparComponent("benepar_en3"))
-    else:
-        nlp.add_pipe("benepar", config={"model": "benepar_en3"})
+                        Human
+                        Automated
+                        Human
+                        Automated
+                        ...
+                        
+    """
 
-    doc = nlp("The time for action is now.")
-    doc = nlp("Every man asked some actress that he met about some play that she appeared in.")
-    #doc = nlp("I throw the ball to the dog")
+    # separate rows for human and machine translations
+    df = df.melt(id_vars=["Original"], 
+        value_vars=["Human", "Automated"],
+        var_name="Translator", 
+        value_name="Translation")
+    # manually name index to "Index"
+    df.index.rename("Index", inplace=True)
+    # sort data frame
+    df = df.sort_values(by=["Original", "Index"])
+    return df
 
-    sent = list(doc.sents)[0]
+def make_bert_datasets(df: pd.DataFrame) -> list:
+    format(df)
+    df.drop(['Original'])
+    out = df.values.tolist()
+    return out
 
-    for sent in doc.sents:
-        print(type(sent))
-        print(compute_parse_tree_metrics(sent))
+# if __name__ == "__main__":
+#     nlp = spacy.load('en_core_web_md')
+#     if spacy.__version__.startswith('2'):
+#         nlp.add_pipe(benepar.BeneparComponent("benepar_en3"))
+#     else:
+#         nlp.add_pipe("benepar", config={"model": "benepar_en3"})
+
+#     doc = nlp("The time for action is now.")
+#     doc = nlp("Every man asked some actress that he met about some play that she appeared in.")
+#     #doc = nlp("I throw the ball to the dog")
+
+#     sent = list(doc.sents)[0]
+
+#     for sent in doc.sents:
+#         print(type(sent))
+#         print(compute_parse_tree_metrics(sent))
     
     # print(sent._.parse_string)
 
