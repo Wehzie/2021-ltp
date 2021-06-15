@@ -39,7 +39,7 @@ if __name__ == "__main__":
     test = data[int(size*0.85):]
 
     # Optional model configuration
-    model_args = ClassificationArgs(num_train_epochs=1)
+    model_args = ClassificationArgs(num_train_epochs=args.epochs)
 
     # Create a ClassificationModel
     model = ClassificationModel(
