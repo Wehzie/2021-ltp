@@ -125,11 +125,14 @@ def format(df: pd.DataFrame) -> pd.DataFrame:
     df = df.sort_values(by=["Original", "Index"])
     return df
 
+
+
 def make_bert_datasets(df: pd.DataFrame) -> list:
-    format(df)
-    df.drop(['Original'])
-    out = df.values.tolist()
-    return out
+    df = format(df)
+    df = df.drop(['Original'], axis = 1)
+    df.columns = ['labels', 'text']
+    df['labels'] = df['labels'].map({'Automated':1, "Human":0})
+    return df
 
 # if __name__ == "__main__":
 #     nlp = spacy.load('en_core_web_md')

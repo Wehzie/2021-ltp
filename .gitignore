@@ -138,6 +138,13 @@ dmypy.json
 data/*
 !data/DATA.md
 
+
+# Added due to bert
+outputs/*
+runs/*
+cache_dir/*
+=1.6
+
 # possible logs
 .log
 .logs
