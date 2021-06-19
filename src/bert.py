@@ -30,6 +30,96 @@ def load_model_pth(model_path: Path):
     model = torch.load(model_path)
     return model
 
+
+model_args_list = [
+    ClassificationArgs(
+        num_train_epochs=2,
+        learning_rate=4e-5,
+        train_batch_size=8,
+        overwrite_output_dir=args.override
+    ),
+    ClassificationArgs(
+        num_train_epochs=3,
+        learning_rate=4e-5,
+        train_batch_size=8,
+        overwrite_output_dir=args.override
+    ),
+    ClassificationArgs(
+        num_train_epochs=2,
+        learning_rate=4e-4,
+        train_batch_size=8,
+        overwrite_output_dir=args.override
+    ),
+    ClassificationArgs(
+        num_train_epochs=3,
+        learning_rate=4e-4,
+        train_batch_size=8,
+        overwrite_output_dir=args.override
+    ),
+
+    
+
+    ClassificationArgs(
+        num_train_epochs=2,
+        learning_rate=4e-5,
+        train_batch_size=16,
+        overwrite_output_dir=args.override
+    ),
+    ClassificationArgs(
+        num_train_epochs=3,
+        learning_rate=4e-5,
+        train_batch_size=16,
+        overwrite_output_dir=args.override
+    ),
+    ClassificationArgs(
+        num_train_epochs=2,
+        learning_rate=4e-4,
+        train_batch_size=16,
+        overwrite_output_dir=args.override
+    ),
+    ClassificationArgs(
+        num_train_epochs=3,
+        learning_rate=4e-4,
+        train_batch_size=16,
+        overwrite_output_dir=args.override
+    )
+]
+
+def get_trained(train, model_args):
+    """
+    train: train data
+    return: trained model
+    """
+    # Create a ClassificationModel
+    model = ClassificationModel(
+        "bert", "bert-base-cased", args=model_args, use_cuda=torch.cuda.is_available()
+    )
+
+    # Train the model
+    model.train_model(train)
+    return model
+
+def test_model(test, model):
+    """
+    test: test data
+    model: trained model
+    """
+    # predict on test set
+    X_test = test["text"].values.tolist()
+    predictions, raw_outputs = model.predict(X_test)
+    test.insert(1, "pred", predictions)    
+
+    print(test.head())
+    
+    # save
+    test.to_csv(Path("data/test_pred.csv"))
+
+    # analyse
+    print(classification_report(test["labels"], test["pred"]))
+
+def get_accuracy(tp, fp, tn, fn):
+    return (tp + tn) / (tp + tn + fp + fn)
+
 if __name__ == "__main__":
 
     logging.basicConfig(level=logging.INFO)
@@ -48,37 +138,23 @@ if __name__ == "__main__":
     dev = data[int(size*0.7):int(size*0.85)]
     test = data[int(size*0.85):]
 
-    # Optional model configuration
-    model_args = ClassificationArgs(
-        num_train_epochs=args.epochs,
-        overwrite_output_dir=args.override
-    )
+    # grid search
+    df_grid = []
+    for i, model_args in enumerate(model_args_list):
+        model = get_trained(train, model_args)
+        result, model_outputs, wrong_predictions = model.eval_model(dev)
+        accuracy = get_accuracy(
+            result["tp"],
+            result["fp"],
+            result["tn"],
+            result["fn"],
+        )
+        print(model_args)
+        print(result)
+        print(accuracy)
+        df_grid.append(model_args)
+        df_grid.append(result)
+        df_grid.append(accuracy)
+        torch.save(model, f'data/model{i}.pth')
 
-    # Create a ClassificationModel
-    model = ClassificationModel(
-        "bert", "bert-base-cased", args=model_args, use_cuda=torch.cuda.is_available()
-    )
 
-    # Train the model
-    model.train_model(train)
-
-    # Evaluate the model
-    result, model_outputs, wrong_predictions = model.eval_model(dev)
-
-    print(result)
-
-    # save model weights and model structure
-    torch.save(model, 'data/model.pth')
-
-    # predict on test set
-    X_test = test["text"].values.tolist()
-    predictions, raw_outputs = model.predict(X_test)
-    test.insert(1, "pred", predictions)    
-
-    print(test.head())
-    
-    # save
-    test.to_csv(Path("data/test_pred.csv"))
-
-    # analyse
-    print(classification_report(test["labels"], test["pred"]))
