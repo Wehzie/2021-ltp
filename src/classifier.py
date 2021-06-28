@@ -39,7 +39,7 @@ if __name__ == "__main__":
     #test_path = Path("data/test/europarl_test.csv")
 
     # read data
-    full = pd.read_csv(dev_path, index_col=0, header = 0, nrows=10000)  # TODO: all data
+    full = pd.read_csv(dev_path, index_col=0, header = 0, nrows=60000)  # TODO: all data
     
     # preprocess: remove short sentences
     full = remove_shorts(full)
@@ -77,7 +77,7 @@ if __name__ == "__main__":
     print("Preprocessing complete.")
 
     # initialize classifier
-    clf = svm.SVC()
+    clf = svm.SVC(kernel="linear")
     clf.fit(X_train, y_train)
     print("Classifier initialized.")
 
@@ -91,3 +91,4 @@ if __name__ == "__main__":
 
     # analyse
     print(classification_report(y_dev, y_dev_pred))
+

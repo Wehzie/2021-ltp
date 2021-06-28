@@ -2,6 +2,7 @@ import argparse
 import sys
 import os
 import logging
+import json
 from pathlib import Path
 
 import pandas as pd
@@ -56,9 +57,6 @@ model_args_list = [
         train_batch_size=8,
         overwrite_output_dir=args.override
     ),
-
-    
-
     ClassificationArgs(
         num_train_epochs=2,
         learning_rate=4e-5,
@@ -82,7 +80,31 @@ model_args_list = [
         learning_rate=4e-4,
         train_batch_size=16,
         overwrite_output_dir=args.override
-    )
+    ),
+        ClassificationArgs(
+        num_train_epochs=2,
+        learning_rate=4e-6,
+        train_batch_size=8,
+        overwrite_output_dir=args.override
+    ),
+    ClassificationArgs(
+        num_train_epochs=2,
+        learning_rate=4e-6,
+        train_batch_size=16,
+        overwrite_output_dir=args.override
+    ),
+        ClassificationArgs(
+        num_train_epochs=3,
+        learning_rate=4e-6,
+        train_batch_size=8,
+        overwrite_output_dir=args.override
+    ),
+    ClassificationArgs(
+        num_train_epochs=3,
+        learning_rate=4e-6,
+        train_batch_size=16,
+        overwrite_output_dir=args.override
+    ),
 ]
 
 def get_trained(train, model_args):
@@ -120,6 +142,33 @@ def test_model(test, model):
 def get_accuracy(tp, fp, tn, fn):
     return (tp + tn) / (tp + tn + fp + fn)
 
+def grid_search(train, dev) -> None:
+    """
+    train: train data
+    dev: dev data
+    returns: None
+    """
+    df_grid = []
+    for i, model_args in enumerate(model_args_list):
+        model = get_trained(train, model_args)
+        result, model_outputs, wrong_predictions = model.eval_model(dev)
+        accuracy = get_accuracy(
+            result["tp"],
+            result["fp"],
+            result["tn"],
+            result["fn"],
+        )
+        print(model_args)
+        print(result)
+        print(accuracy)
+        df_grid.append(str(model_args))
+        df_grid.append(str(result))
+        df_grid.append(str(accuracy))
+        torch.save(model, f'data/model{i}.pth')
+    
+    with open('grid_search.txt', 'w') as f:
+        f.write(json.dumps(df_grid))
+
 if __name__ == "__main__":
 
     logging.basicConfig(level=logging.INFO)
@@ -138,23 +187,17 @@ if __name__ == "__main__":
     dev = data[int(size*0.7):int(size*0.85)]
     test = data[int(size*0.85):]
 
-    # grid search
-    df_grid = []
-    for i, model_args in enumerate(model_args_list):
-        model = get_trained(train, model_args)
-        result, model_outputs, wrong_predictions = model.eval_model(dev)
-        accuracy = get_accuracy(
-            result["tp"],
-            result["fp"],
-            result["tn"],
-            result["fn"],
-        )
-        print(model_args)
-        print(result)
-        print(accuracy)
-        df_grid.append(model_args)
-        df_grid.append(result)
-        df_grid.append(accuracy)
-        torch.save(model, f'data/model{i}.pth')
+    # train best model
+    model_args = ClassificationArgs(
+        num_train_epochs=3,
+        learning_rate=4e-5,
+        train_batch_size=16,
+        overwrite_output_dir=args.override
+    )
+    model = get_trained(train, model_args)
 
+    # test best model
+    test_model(test, model)
 
+    
+    
