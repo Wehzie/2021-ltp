@@ -46,9 +46,13 @@ Navigate to the project's root directory.
 
     cd ~/path/to/project
 
-Execute the `main` module.
+Execute the `classifier` module for the feature svm.
 
-    python3 src/main.py
+    python3 src/classifier.py
+
+Execute the `bert` module for the Bert module
+
+    python3 src/bert.py
 
 ## Architecture
 
