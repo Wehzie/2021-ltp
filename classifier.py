@@ -35,7 +35,7 @@ def remove_shorts(df):
 
 if __name__ == "__main__":
     #train_path = Path("data/train/features_train.csv")
-    dev_path = Path("data/dev/features_dev.csv")
+    dev_path = Path("data/dev/features_dev_t.csv")
     #test_path = Path("data/test/europarl_test.csv")
 
     # read data
