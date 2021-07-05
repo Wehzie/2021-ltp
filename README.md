@@ -46,7 +46,7 @@ Download the datasets from here (too big for github):
 
     https://drive.google.com/file/d/1X4VSUonqtCCtSIByR9S3nvEZL2knn61M/view?usp=sharing
 
-and replace the data folder in this project with the unzipped data folder from the link.
+Download the folder 'data copy', rename it to 'data', and replace the 'data' folder in this project with the unzipped data folder from the link.
 
 Navigate to the project's root directory.
 
