@@ -56,7 +56,7 @@ Execute the `classifier` module for the feature svm.
 
     python3 src/classifier.py
 
-Execute the `bert` module for the Bert module
+Execute the `bert` module for the Bert network
 
     python3 src/bert.py
 
