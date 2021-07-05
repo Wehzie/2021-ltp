@@ -1,7 +1,7 @@
 # Language Technology Project 2021
 
 We present a NLP pipeline targeted at machine-translation to human-translation comparison.
-The UNKNOWN dataset is used.
+The Europarl dataset is used.
 
 ## Requirements
 
@@ -41,6 +41,12 @@ After using the pipeline you may wish to deactivate the virtual environment as f
     deactivate
 
 ## Running
+
+Download the datasets from here (too big for github):
+
+    https://drive.google.com/file/d/1X4VSUonqtCCtSIByR9S3nvEZL2knn61M/view?usp=sharing
+
+and replace the data folder in this project with the unzipped data folder from the link.
 
 Navigate to the project's root directory.
 
