@@ -40,25 +40,45 @@ After using the pipeline you may wish to deactivate the virtual environment as f
 
     deactivate
 
+The `benepar` and `spacy` modules require additional data that is downloaded as follows.
+
+    python3 setup.py
+
 ## Running
 
 Download the datasets from here (too big for github):
 
     https://drive.google.com/file/d/1X4VSUonqtCCtSIByR9S3nvEZL2knn61M/view?usp=sharing
 
-Download the folder 'data copy', rename it to 'data', and replace the 'data' folder in this project with the unzipped data folder from the link.
+Download and unpack the folder `data copy`, rename it to `data`, and replace the `data` folder in this project. On Linux the following is equivalent.
+
+    cd ~/Downloads
+    unzip data.zip
+    mv -v "data copy"/* path/to/project/data
+
+The outcome should look as follows.
+
+    project/
+        data/
+            DATA.md
+            dev/
+            test/
+            train/
 
 Navigate to the project's root directory.
 
     cd ~/path/to/project
 
-Execute the `classifier` module for the feature svm.
+Execute the `classifier` module for the feature based SVM.
 
     python3 src/classifier.py
 
-Execute the `bert` module for the Bert network
+Execute the `bert` module for the Bert network.
+The `--override` option overrides model data from previous runs; passing this flag will usually be necessary when training a new model.
+Use flag `--nrows` to control the amount of data loaded.
+use `--epochs` to control the number training of epochs.
 
-    python3 src/bert.py
+    python3 src/bert.py --override
 
 ## Architecture
 

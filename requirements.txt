@@ -10,11 +10,7 @@ google-cloud-translate
 simpletransformers
 transformers
 
-# Data requirements
-# import benepar
-# benepar.download('benepar_en3')
-# import spacy.cli
-# spacy.cli.download("en_core_web_sm")
+# For data requirements see setup.py
 
 # development and testing
 black

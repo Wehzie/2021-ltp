@@ -14,7 +14,7 @@ sys.path.append(os.getcwd())
 from src.utils import make_bert_datasets
 
 parser = argparse.ArgumentParser(description='Train and use Bert model.')
-parser.add_argument('--nrows', default=None, type=int, nargs='?',
+parser.add_argument('--nrows', default=60000, type=int, nargs='?',
                     help='number of data rows')
 parser.add_argument('--epochs', default=1, type=int, nargs='?',
                     help='number of data rows')
